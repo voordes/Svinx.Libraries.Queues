@@ -4,6 +4,18 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Svinx.Libraries.RabbitMQ</AssemblyName>
     <RootNamespace>Svinx.Libraries.RabbitMQ</RootNamespace>
+    <PackageId>Svinx.Libraries.RabbitMQ</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>Sandor Voordes</Authors>
+    <Description>RabbitMQ Wrapper Library</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <Copyright>Copyright 2017 (c) Svinx. All rights reserved.</Copyright>
+    <PackageTags>RabbitMQ RPC</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard2.0\Svinx.Libraries.RabbitMQ.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
