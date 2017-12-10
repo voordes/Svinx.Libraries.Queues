@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Svinx.Libraries.RabbitMQ
 {
-    public class RPCClient
+    public class RPCClient: IRPCClient
     {
         private string _uri;
 
@@ -33,7 +33,7 @@ namespace Svinx.Libraries.RabbitMQ
             this._uri = uri;
         }
 
-        protected virtual void OnStarted(EventArgs e)
+        public void OnStarted(EventArgs e)
         {
             if (this.Started != null)
             {
@@ -41,7 +41,7 @@ namespace Svinx.Libraries.RabbitMQ
             }
         }
 
-        protected virtual void OnMessageReceived(MessageArgs e)
+        public void OnMessageReceived(MessageArgs e)
         {
             if (this.MessageReceived != null)
             {
@@ -49,7 +49,7 @@ namespace Svinx.Libraries.RabbitMQ
             }
         }
 
-        protected virtual void OnException(UnhandledExceptionEventArgs e)
+        public void OnException(UnhandledExceptionEventArgs e)
         {
             if (this.Exception != null)
             {
@@ -57,7 +57,7 @@ namespace Svinx.Libraries.RabbitMQ
             }
         }
 
-        protected virtual void OnActionProcessed(ActionArgs e)
+        public void OnActionProcessed(ActionArgs e)
         {
             if (this.ActionProcessed != null)
             {

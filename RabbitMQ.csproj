@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>Svinx.Libraries.RabbitMQ</AssemblyName>
     <RootNamespace>Svinx.Libraries.RabbitMQ</RootNamespace>
     <PackageId>Svinx.Libraries.RabbitMQ</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
-    <Authors>Sandor Voordes</Authors>
+    <Authors>Svinx (Sandor Voordes)</Authors>
     <Description>RabbitMQ Wrapper Library</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>First release</PackageReleaseNotes>
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\Svinx.Libraries.RabbitMQ.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netcoreapp2.0\Svinx.Libraries.RabbitMQ.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,4 +23,10 @@
     <PackageReference Include="RabbitMQ.Client" Version="5.0.1" />
   </ItemGroup>
 
+<Target Name="CopyPackage" AfterTargets="Pack">
+    <Copy
+        SourceFiles="$(OutputPath)..\$(PackageId).$(PackageVersion).nupkg"
+        DestinationFolder="c:\temp\packages\"
+        />
+</Target>
 </Project>
