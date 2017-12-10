@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Svinx.Libraries.Queues.Delegates;
@@ -9,7 +10,9 @@ namespace Svinx.Libraries.Queues.RabbitMQ
 {
     public class RPCClient: BaseRPCClient
     {
-        private string _uri;
+        private string _queueUrl;
+
+        private string _queueName;
 
         private IConnection _connection;
 
@@ -19,16 +22,18 @@ namespace Svinx.Libraries.Queues.RabbitMQ
 
         private QueueingBasicConsumer _consumer;
 
-        public RPCClient(string uri)
+        public RPCClient(IOptions<Queue> options)
         {
-            this._uri = uri;
+            this._queueUrl = options.Value.queueUrl;
+            this._queueName = options.Value.queueName;
+            Start();
         }
 
-        public override void Start(string queue)
+        private void Start()
         {
             ConnectionFactory connectionFactory = new ConnectionFactory
             {
-                Uri = new Uri(this._uri)
+                Uri = new Uri(this._queueUrl)
             };
             this._connection = connectionFactory.CreateConnection();
             this._channel = this._connection.CreateModel();
@@ -45,7 +50,7 @@ namespace Svinx.Libraries.Queues.RabbitMQ
             basicProperties.CorrelationId = text;
             string s = JsonConvert.SerializeObject(req);
             byte[] bytes = Encoding.UTF8.GetBytes(s);
-            this._channel.BasicPublish("", "rpc_queue", basicProperties, bytes);
+            this._channel.BasicPublish(string.Empty, this._queueName, basicProperties, bytes);
             BasicDeliverEventArgs basicDeliverEventArgs;
             do
             {

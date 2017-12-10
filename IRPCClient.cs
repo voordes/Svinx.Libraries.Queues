@@ -21,8 +21,6 @@ namespace Svinx.Libraries.Queues
 
         void OnActionProcessed(ActionArgs e);
 
-        void Start(string queue);
-
         TResp Call<TReq, TResp>(TReq req);
     }
 }

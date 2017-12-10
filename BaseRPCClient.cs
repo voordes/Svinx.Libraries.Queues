@@ -47,8 +47,6 @@ namespace Svinx.Libraries.Queues
             }
         }
 
-        public abstract void Start(string queue);
-
         public abstract TResp Call<TReq, TResp>(TReq req);
     }
 }
