@@ -1,14 +1,13 @@
 ﻿using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Svinx.Libraries.RabbitMQ.Delegates;
+using Svinx.Libraries.Queues.Delegates;
 using System;
-using System.Collections.Generic;
 using System.Text;
 
-namespace Svinx.Libraries.RabbitMQ
+namespace Svinx.Libraries.Queues.RabbitMQ
 {
-    public class RPCClient: IRPCClient
+    public class RPCClient: BaseRPCClient
     {
         private string _uri;
 
@@ -20,52 +19,12 @@ namespace Svinx.Libraries.RabbitMQ
 
         private QueueingBasicConsumer _consumer;
 
-        public event EventHandler Started;
-
-        public event MessageReceivedEventHandler MessageReceived;
-
-        public event ActionProcessedEventHandler ActionProcessed;
-
-        public event UnhandledExceptionEventHandler Exception;
-
         public RPCClient(string uri)
         {
             this._uri = uri;
         }
 
-        public void OnStarted(EventArgs e)
-        {
-            if (this.Started != null)
-            {
-                this.Started(this, e);
-            }
-        }
-
-        public void OnMessageReceived(MessageArgs e)
-        {
-            if (this.MessageReceived != null)
-            {
-                this.MessageReceived(this, e);
-            }
-        }
-
-        public void OnException(UnhandledExceptionEventArgs e)
-        {
-            if (this.Exception != null)
-            {
-                this.Exception(this, e);
-            }
-        }
-
-        public void OnActionProcessed(ActionArgs e)
-        {
-            if (this.ActionProcessed != null)
-            {
-                this.ActionProcessed(this, e);
-            }
-        }
-
-        public void Start(string queue)
+        public override void Start(string queue)
         {
             ConnectionFactory connectionFactory = new ConnectionFactory
             {
@@ -78,7 +37,7 @@ namespace Svinx.Libraries.RabbitMQ
             this._channel.BasicConsume(this._replyQueueName, true, this._consumer);
         }
 
-        public TResp Call<TReq, TResp>(TReq req)
+        public override TResp Call<TReq, TResp>(TReq req)
         {
             string text = Guid.NewGuid().ToString();
             IBasicProperties basicProperties = this._channel.CreateBasicProperties();

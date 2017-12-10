@@ -3,7 +3,7 @@ using System;
 
 namespace Svinx.Libraries.Queues
 {
-    public interface IRPCClient
+    public interface IRPCServer
     {
         event EventHandler Started;
 
@@ -21,8 +21,8 @@ namespace Svinx.Libraries.Queues
 
         void OnActionProcessed(ActionArgs e);
 
-        void Start(string queue);
+        void ListenOn<TReq, TResp>(Func<TReq, TResp> callback);
 
-        TResp Call<TReq, TResp>(TReq req);
+        void Connect();
     }
 }

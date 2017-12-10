@@ -1,14 +1,13 @@
 ﻿using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using Svinx.Libraries.RabbitMQ.Delegates;
+using Svinx.Libraries.Queues.Delegates;
 using System;
-using System.Collections.Generic;
 using System.Text;
 
-namespace Svinx.Libraries.RabbitMQ
+namespace Svinx.Libraries.Queues.RabbitMQ
 {
-    public class RPCServer
+    public class RPCServer: BaseRPCServer
     {
         private string _uri;
 
@@ -18,53 +17,13 @@ namespace Svinx.Libraries.RabbitMQ
 
         private QueueingBasicConsumer _consumer;
 
-        public event EventHandler Started;
-
-        public event MessageReceivedEventHandler MessageReceived;
-
-        public event ActionProcessedEventHandler ActionProcessed;
-
-        public event UnhandledExceptionEventHandler Exception;
-
         public RPCServer(string uri, string queue)
         {
             this._uri = uri;
             this._queue = queue;
         }
 
-        protected virtual void OnStarted(EventArgs e)
-        {
-            if (this.Started != null)
-            {
-                this.Started(this, e);
-            }
-        }
-
-        protected virtual void OnMessageReceived(MessageArgs e)
-        {
-            if (this.MessageReceived != null)
-            {
-                this.MessageReceived(this, e);
-            }
-        }
-
-        protected virtual void OnException(UnhandledExceptionEventArgs e)
-        {
-            if (this.Exception != null)
-            {
-                this.Exception(this, e);
-            }
-        }
-
-        protected virtual void OnActionProcessed(ActionArgs e)
-        {
-            if (this.ActionProcessed != null)
-            {
-                this.ActionProcessed(this, e);
-            }
-        }
-
-        public void ListenOn<TReq, TResp>(Func<TReq, TResp> callback)
+        override public void ListenOn<TReq, TResp>(Func<TReq, TResp> callback)
         {
             while (true)
             {
@@ -80,7 +39,7 @@ namespace Svinx.Libraries.RabbitMQ
                     string @string = Encoding.UTF8.GetString(body);
                     this.OnMessageReceived(new MessageArgs(@string));
                     TReq req = JsonConvert.DeserializeObject<TReq>(@string);
-                    obj = Helper.RunAndLogTime<TReq, TResp>(callback, req, out milliseconds);
+                    obj = Diagnostics.RunAndLogTime<TReq, TResp>(callback, req, out milliseconds);
                 }
                 catch (Exception exception)
                 {
@@ -97,7 +56,7 @@ namespace Svinx.Libraries.RabbitMQ
             }
         }
 
-        public void Connect()
+        override public void Connect()
         {
             ConnectionFactory connectionFactory = new ConnectionFactory
             {

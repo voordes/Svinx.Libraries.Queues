@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace Svinx.Libraries.RabbitMQ
+namespace Svinx.Libraries.Queues
 {
-    public static class Helper
+    public static class Diagnostics
     {
         public static TResp RunAndLogTime<TReq, TResp>(Func<TReq, TResp> callback, TReq req, out long milliseconds)
         {
@@ -20,7 +20,7 @@ namespace Svinx.Libraries.RabbitMQ
             catch (Exception ex)
             {
                 ex.ToString();
-                throw new Exception(string.Format("RunAndLogTime: {0}", ex.Message), ex);
+                throw new Exception($"RunAndLogTime: {ex.Message}", ex);
             }
             finally
             {

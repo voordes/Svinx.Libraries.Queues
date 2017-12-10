@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Svinx.Libraries.RabbitMQ.Delegates
+namespace Svinx.Libraries.Queues.Delegates
 {
     public delegate void MessageReceivedEventHandler(object sender, MessageArgs e);
     public delegate void ActionProcessedEventHandler(object sender, ActionArgs e);
