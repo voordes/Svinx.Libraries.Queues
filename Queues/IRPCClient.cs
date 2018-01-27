@@ -23,5 +23,8 @@ namespace Svinx.Libraries.Queues
         void OnActionProcessed(ActionArgs e);
 
         Task<TResp> Call<TReq, TResp>(TReq req);
+
+        void Cancel();
+
     }
 }

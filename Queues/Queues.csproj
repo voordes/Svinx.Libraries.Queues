@@ -5,7 +5,7 @@
     <AssemblyName>Svinx.Libraries.Queues</AssemblyName>
     <RootNamespace>Svinx.Libraries.Queues</RootNamespace>
     <PackageId>Svinx.Libraries.Queues</PackageId>
-    <PackageVersion>1.0.3</PackageVersion>
+    <PackageVersion>1.0.5</PackageVersion>
     <Authors>Svinx (Sandor Voordes)</Authors>
     <Description>Queues Wrapper Library</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,8 +13,8 @@
     <Copyright>Copyright 2017 (c) Svinx. All rights reserved.</Copyright>
     <PackageTags>Queues RabbitMQ RPC</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.3</Version>
-  </PropertyGroup>
+    <Version>1.0.5</Version>
+  </PropertyGroup>  
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netcoreapp2.0\Svinx.Libraries.Queues.xml</DocumentationFile>

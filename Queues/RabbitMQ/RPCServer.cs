@@ -11,6 +11,8 @@ namespace Svinx.Libraries.Queues.RabbitMQ
 {
     public class RPCServer: BaseRPCServer
     {
+        private bool _listening;
+
         private string _queueUrl;
 
         private string _queueName;
@@ -26,8 +28,9 @@ namespace Svinx.Libraries.Queues.RabbitMQ
             Connect();
         }
 
-        public override async Task ListenOn<TReq, TResp>(Func<TReq, TResp> callback)
+        public override async Task Listen<TReq, TResp>(Func<TReq, TResp> callback)
         {
+            _listening = true;
             while (true)
             {
                 object obj = null;
@@ -65,13 +68,32 @@ namespace Svinx.Libraries.Queues.RabbitMQ
             {
                 Uri = new Uri(this._queueUrl)
             };
-            IConnection connection = connectionFactory.CreateConnection();
+            var connection = connectionFactory.CreateConnection();
             this._channel = connection.CreateModel();
             this._channel.QueueDeclare(this._queueName, false, false, false, null);
             this._channel.BasicQos(0u, 1, false);
             this._consumer = new QueueingBasicConsumer(this._channel);
-            this._channel.BasicConsume(this._queueName, false, this._consumer);
+            this._channel.BasicConsume(this._queueName, false, _consumer);
             this.OnStarted(EventArgs.Empty);
+            connection.AutoClose = true;
+        }
+
+        public override void Stop()
+        {
+            _listening = false;
+        }
+
+        public void Disconnect()
+        {
+            this._channel.Close();
+            this._channel.Dispose();
+            this._consumer = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            this.Stop();
         }
     }
 }

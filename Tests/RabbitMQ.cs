@@ -15,7 +15,6 @@ namespace Svinx.Libraries.Queues.Tests
             var t1 = Client();
             var t2 = Server();
             Task.WaitAll(new Task[] { t1, t2 }, 1000);
-            //System.Threading.Thread.Sleep(5000);
             Assert.IsTrue(t1.IsCompleted, "RPC did not finish within 1 second");
             //Assert.IsTrue(t2.IsCompleted, "Server did not finish within 1 seconds");
             Assert.IsTrue(t1.Exception == null, $"Client returned exception: {t1.Exception?.ToString()}");
@@ -43,7 +42,7 @@ namespace Svinx.Libraries.Queues.Tests
             });
             var server = new RPCServer(options);
             Func<dynamic, dynamic> f = (req => new { a = req.a + 1, b = req.b + 1 });
-            await server.ListenOn<dynamic, dynamic>(f);
+            await server.Listen<dynamic, dynamic>(f);
         }
     }
 }

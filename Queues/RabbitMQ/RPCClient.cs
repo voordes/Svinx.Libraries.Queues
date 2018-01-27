@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Svinx.Libraries.Queues.RabbitMQ
 {
-    public class RPCClient: BaseRPCClient
+    public class RPCClient : BaseRPCClient
     {
+        private bool _waiting;
+
         private string _queueUrl;
 
         private string _queueName;
-
-        private IConnection _connection;
 
         private IModel _channel;
 
@@ -27,20 +27,21 @@ namespace Svinx.Libraries.Queues.RabbitMQ
         {
             this._queueUrl = options.Value.queueUrl;
             this._queueName = options.Value.queueName;
-            Start();
+            Connect();
         }
 
-        private void Start()
+        private void Connect()
         {
             ConnectionFactory connectionFactory = new ConnectionFactory
             {
                 Uri = new Uri(this._queueUrl)
             };
-            this._connection = connectionFactory.CreateConnection();
-            this._channel = this._connection.CreateModel();
+            var connection = connectionFactory.CreateConnection();
+            this._channel = connection.CreateModel();
             this._replyQueueName = this._channel.QueueDeclare().QueueName;
             this._consumer = new QueueingBasicConsumer(this._channel);
             this._channel.BasicConsume(this._replyQueueName, true, this._consumer);
+            connection.AutoClose = true;
         }
 
         public async override Task<TResp> Call<TReq, TResp>(TReq req)
@@ -53,12 +54,32 @@ namespace Svinx.Libraries.Queues.RabbitMQ
             byte[] bytes = Encoding.UTF8.GetBytes(s);
             this._channel.BasicPublish(string.Empty, this._queueName, basicProperties, bytes);
             BasicDeliverEventArgs basicDeliverEventArgs;
+            _waiting = true;
             do
             {
-                basicDeliverEventArgs  = await Task.Run(() => this._consumer.Queue.Dequeue());
+                basicDeliverEventArgs = await Task.Run(() => this._consumer.Queue.Dequeue());
             }
-            while (!(basicDeliverEventArgs.BasicProperties.CorrelationId == text));
+            while (_waiting && !(basicDeliverEventArgs.BasicProperties.CorrelationId == text));
             return JsonConvert.DeserializeObject<TResp>(Encoding.UTF8.GetString(basicDeliverEventArgs.Body));
         }
+
+        private void Disconnect()
+        {
+            this._channel.Close();
+            this._channel.Dispose();
+            this._consumer = null;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            this.Disconnect();
+        }
+
+        public override void Cancel()
+        {
+            _waiting = false;
+        }
+
     }
 }

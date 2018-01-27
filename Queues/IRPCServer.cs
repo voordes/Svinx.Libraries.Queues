@@ -22,6 +22,8 @@ namespace Svinx.Libraries.Queues
 
         void OnActionProcessed(ActionArgs e);
 
-        Task ListenOn<TReq, TResp>(Func<TReq, TResp> callback);
+        Task Listen<TReq, TResp>(Func<TReq, TResp> callback);
+
+        void Stop();
     }
 }
