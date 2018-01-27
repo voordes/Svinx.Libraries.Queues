@@ -5,6 +5,7 @@ using RabbitMQ.Client.Events;
 using Svinx.Libraries.Queues.Delegates;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Svinx.Libraries.Queues.RabbitMQ
 {
@@ -42,7 +43,7 @@ namespace Svinx.Libraries.Queues.RabbitMQ
             this._channel.BasicConsume(this._replyQueueName, true, this._consumer);
         }
 
-        public override TResp Call<TReq, TResp>(TReq req)
+        public async override Task<TResp> Call<TReq, TResp>(TReq req)
         {
             string text = Guid.NewGuid().ToString();
             IBasicProperties basicProperties = this._channel.CreateBasicProperties();
@@ -54,7 +55,7 @@ namespace Svinx.Libraries.Queues.RabbitMQ
             BasicDeliverEventArgs basicDeliverEventArgs;
             do
             {
-                basicDeliverEventArgs = this._consumer.Queue.Dequeue();
+                basicDeliverEventArgs  = await Task.Run(() => this._consumer.Queue.Dequeue());
             }
             while (!(basicDeliverEventArgs.BasicProperties.CorrelationId == text));
             return JsonConvert.DeserializeObject<TResp>(Encoding.UTF8.GetString(basicDeliverEventArgs.Body));

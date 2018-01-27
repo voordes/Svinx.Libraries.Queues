@@ -2,6 +2,7 @@
 using Svinx.Libraries.Queues.Delegates;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Svinx.Libraries.Queues
 {
@@ -47,6 +48,6 @@ namespace Svinx.Libraries.Queues
             }
         }
 
-        public abstract TResp Call<TReq, TResp>(TReq req);
+        public abstract Task<TResp> Call<TReq, TResp>(TReq req);
     }
 }

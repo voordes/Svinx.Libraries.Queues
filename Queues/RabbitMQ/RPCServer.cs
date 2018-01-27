@@ -1,34 +1,37 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Svinx.Libraries.Queues.Delegates;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Svinx.Libraries.Queues.RabbitMQ
 {
     public class RPCServer: BaseRPCServer
     {
-        private string _uri;
+        private string _queueUrl;
 
-        private string _queue;
+        private string _queueName;
 
         private IModel _channel;
 
         private QueueingBasicConsumer _consumer;
 
-        public RPCServer(string uri, string queue)
+        public RPCServer(IOptions<Queue> options)
         {
-            this._uri = uri;
-            this._queue = queue;
+            this._queueUrl = options.Value.queueUrl;
+            this._queueName = options.Value.queueName;
+            Connect();
         }
 
-        override public void ListenOn<TReq, TResp>(Func<TReq, TResp> callback)
+        public override async Task ListenOn<TReq, TResp>(Func<TReq, TResp> callback)
         {
             while (true)
             {
                 object obj = null;
-                BasicDeliverEventArgs basicDeliverEventArgs = this._consumer.Queue.Dequeue();
+                BasicDeliverEventArgs basicDeliverEventArgs = await Task.Run(() => this._consumer.Queue.Dequeue());
                 byte[] body = basicDeliverEventArgs.Body;
                 IBasicProperties basicProperties = basicDeliverEventArgs.BasicProperties;
                 IBasicProperties basicProperties2 = this._channel.CreateBasicProperties();
@@ -56,18 +59,18 @@ namespace Svinx.Libraries.Queues.RabbitMQ
             }
         }
 
-        override public void Connect()
+        public void Connect()
         {
             ConnectionFactory connectionFactory = new ConnectionFactory
             {
-                Uri = new Uri(this._uri)
+                Uri = new Uri(this._queueUrl)
             };
             IConnection connection = connectionFactory.CreateConnection();
             this._channel = connection.CreateModel();
-            this._channel.QueueDeclare(this._queue, false, false, false, null);
+            this._channel.QueueDeclare(this._queueName, false, false, false, null);
             this._channel.BasicQos(0u, 1, false);
             this._consumer = new QueueingBasicConsumer(this._channel);
-            this._channel.BasicConsume(this._queue, false, this._consumer);
+            this._channel.BasicConsume(this._queueName, false, this._consumer);
             this.OnStarted(EventArgs.Empty);
         }
     }

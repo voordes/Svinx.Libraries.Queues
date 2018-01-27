@@ -1,5 +1,6 @@
 ﻿using Svinx.Libraries.Queues.Delegates;
 using System;
+using System.Threading.Tasks;
 
 namespace Svinx.Libraries.Queues
 {
@@ -21,6 +22,6 @@ namespace Svinx.Libraries.Queues
 
         void OnActionProcessed(ActionArgs e);
 
-        TResp Call<TReq, TResp>(TReq req);
+        Task<TResp> Call<TReq, TResp>(TReq req);
     }
 }

@@ -4,6 +4,7 @@ using RabbitMQ.Client.Events;
 using Svinx.Libraries.Queues.Delegates;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Svinx.Libraries.Queues
 {
@@ -49,8 +50,7 @@ namespace Svinx.Libraries.Queues
             }
         }
 
-        public abstract void ListenOn<TReq, TResp>(Func<TReq, TResp> callback);
+        public abstract Task ListenOn<TReq, TResp>(Func<TReq, TResp> callback);
 
-        public abstract void Connect();
     }
 }
